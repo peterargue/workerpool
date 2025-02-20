@@ -1,6 +1,7 @@
 # Workerpool
 
-Workerpool is a generic, concurrent worker pool module written in Go. It leverages Go generics, the `errgroup` package, and context cancellation to provide a flexible and robust solution for coordinating concurrent producers and consumers.
+Workerpool is a generic, concurrent worker pool module written in Go. It's designed to be flexible
+and easy to use, allowing you to setup and run a worker pool with minimal boilerplate code.
 
 ## Features
 
@@ -48,18 +49,21 @@ func main() {
             fmt.Printf("Processed: %d\n", v)
             return nil
         })
+	
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel() // call cancel to stop the worker pool, or use a timeout
 
 	// Run the worker pool.
-	if err := wp.Run(context.Background()); err != nil {
+	if err := wp.Run(ctx); err != nil {
 		fmt.Printf("Workerpool error: %v\n", err)
 	}
 }
 ```
 
 # Use Cases
-•	One-to-Many: Use a single producer (e.g., reading from a file) with multiple consumers processing the data concurrently.
-•	Many-to-One: Use multiple producers (e.g., concurrent data fetchers) that feed into a single consumer (e.g., a writer).
-•	Many-to-Many: Combine multiple producers and consumers for maximum parallelism.
+* One-to-Many: Use a single producer (e.g., reading from a file) with multiple consumers processing the data concurrently.
+* Many-to-One: Use multiple producers (e.g., concurrent data fetchers) that feed into a single consumer (e.g., a writer).
+* Many-to-Many: Combine multiple producers and consumers for maximum parallelism.
 
 Simply adjust the counts in AddProducers and AddConsumers to suit your application’s requirements.
 
